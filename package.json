@@ -1,0 +1,14 @@
+{
+  "name": "onay-fullstack-project",
+  "version": "1.0.0",
+  "description": "Объединенный фронтенд и бэкенд для проекта ONAY",
+  "scripts": {
+    "install-all": "npm install --prefix transport-backend && npm install --prefix bus-pay-app",
+    "backend": "npm run dev --prefix transport-backend",
+    "frontend": "npm run dev --prefix bus-pay-app",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

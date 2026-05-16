@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Твой остальной CSS-код (body, стили для сканера и т.д.) остается ниже без изменений */
+body {
+  margin: 0;
+  background-color: #f5f5f7;
+}
