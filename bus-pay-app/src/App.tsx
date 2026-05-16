@@ -12,7 +12,7 @@ interface ITicket {
 }
 
 export default function App() {
-  const API_BASE_URL = 'http://localhost:5000/api'; 
+  const API_BASE_URL = 'https://onay-backend.onrender.com/api'; 
 
   // --- АВТОРИЗАЦИЯ С ЛОКАЛЬНЫМ ХРАНИЛИЩЕМ ---
   // При старте проверяем, есть ли сохраненный юзер в localStorage
