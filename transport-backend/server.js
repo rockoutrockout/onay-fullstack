@@ -9,11 +9,11 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log('📦 База данных MongoDB Atlas успешно СВЯЗАНА!'))
   .catch(err => console.error('❌ КРИТИЧЕСКАЯ ОШИБКА ПОДКЛЮЧЕНИЯ К MONGODB:', err));
 
-// Обновленная схема: теперь роль (тип тарифа) жестко зафиксирована за аккаунтом
+// --- СХЕМЫ ДАННЫХ ---
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['standard', 'student'], default: 'standard' }, // ТАРИФ ЮЗЕРА
+  role: { type: String, enum: ['standard', 'student'], default: 'standard' }, 
   balance: { type: Number, required: true, default: 2500 }
 });
 const User = mongoose.model('User', userSchema);
@@ -32,12 +32,20 @@ const Ticket = mongoose.model('Ticket', ticketSchema);
 const app = express();
 const PORT = 5000;
 
+// Разрешаем любые входящие запросы с любых портов и протоколов
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// 1. Регистрация с выбором роли (тарифа)
+// --- API РОУТЫ ---
+
+// Тестовый роут для проверки связи
+app.get('/api/test', (req, res) => {
+  res.json({ message: "Бэкенд успешно работает в локальной сети!" });
+});
+
+// 1. Регистрация
 app.post('/api/auth/register', async (req, res) => {
-  const { username, password, role } = req.body; // Получаем роль от фронтенда
+  const { username, password, role } = req.body; 
   if (!username || !password) {
     return res.status(400).json({ error: 'Заполните все поля!' });
   }
@@ -53,7 +61,7 @@ app.post('/api/auth/register', async (req, res) => {
     const newUser = await User.create({
       username,
       password: hashedPassword,
-      role: role === 'student' ? 'student' : 'standard', // Защита значения
+      role: role === 'student' ? 'student' : 'standard', 
       balance: 2500 
     });
 
@@ -64,7 +72,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// 2. Вход в систему (возвращает роль на фронтенд)
+// 2. Вход в систему
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -80,6 +88,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// Данные юзера
 app.get('/api/user/:username', async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
@@ -90,6 +99,7 @@ app.get('/api/user/:username', async (req, res) => {
   }
 });
 
+// История билетов
 app.get('/api/tickets/:username', async (req, res) => {
   try {
     const tickets = await Ticket.find({ username: req.params.username }).sort({ createdAt: -1 });
@@ -99,17 +109,15 @@ app.get('/api/tickets/:username', async (req, res) => {
   }
 });
 
-// 3. ПОЛНАЯ ЗАЩИТА: Бэкенд сам решает, сколько списать, основываясь на роли из БД!
+// 3. Покупка билета
 app.post('/api/tickets/buy', async (req, res) => {
-  const { username, busNumber } = req.body; // Фронтенд больше НЕ ПРИСЫЛАЕТ тип тарифа
+  const { username, busNumber } = req.body; 
   if (!username || !busNumber) return res.status(400).json({ error: 'Неполные данные' });
 
   try {
-    // Ищем пользователя в бд, чтобы узнать его реальный статус
     const user = await User.findOne({ username });
     if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
 
-    // Бэкенд жестко ставит цену сам!
     const price = user.role === 'student' ? 50 : 100;
 
     if (user.balance < price) return res.status(400).json({ error: 'Недостаточно средств' });
@@ -121,7 +129,7 @@ app.post('/api/tickets/buy', async (req, res) => {
     const newTicket = new Ticket({
       username,
       busNumber,
-      ticketType: user.role, // Записываем тариф из профиля
+      ticketType: user.role, 
       price,
       date: now.toLocaleDateString('ru-RU'),
       time: now.toLocaleTimeString('ru-RU').slice(0, 5)
@@ -134,6 +142,7 @@ app.post('/api/tickets/buy', async (req, res) => {
   }
 });
 
+// Пополнение баланса
 app.post('/api/user/topup', async (req, res) => {
   const { username, amount } = req.body;
   try {
@@ -149,6 +158,7 @@ app.post('/api/user/topup', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Защищенный бэкенд запущен на http://localhost:${PORT}`);
+// Вещаем на '0.0.0.0', чтобы бэкенд был виден для мобильного телефона в одной Wi-Fi сети
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Бэкенд успешно запущен на http://192.168.1.194:${PORT}`);
 });
