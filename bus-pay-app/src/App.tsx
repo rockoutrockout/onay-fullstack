@@ -12,7 +12,7 @@ interface ITicket {
 }
 
 export default function App() {
-  const API_BASE_URL = 'https://onay-fullstack.onrender.com/api';
+  const API_BASE_URL = 'https://onay-fullstack.onrender.com';
 
   // --- АВТОРИЗАЦИЯ С ЛОКАЛЬНЫМ ХРАНИЛИЩЕМ ---
   const [currentUser, setCurrentUser] = useState<string | null>(() => {
