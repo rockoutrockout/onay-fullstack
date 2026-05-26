@@ -277,7 +277,7 @@ export default function App() {
             <div className="space-y-6">
               <div className="bg-[#f5f5f7] p-3 rounded-xl flex items-center justify-between px-4">
                 <div className="flex items-center gap-2 text-[#86868b]"><Clock className="w-4 h-4" /><span className="text-xs font-medium">Время контроля:</span></div>
-                <span className="text-base font-mono font-bold text-[#1d1d1f]">{currentTime.toLocaleTimeString('ru-RU')}</span>
+                <span className="text-base font-mono font-bold text-[#1d1d1f]">| {currentTime.toLocaleTimeString('ru-RU')}</span>
               </div>
               <div className="bg-white border border-[#e8e8ed] p-5 rounded-3xl flex justify-center"><QrCode className="w-44 h-44 text-[#1d1d1f]" strokeWidth={1.2} /></div>
             </div>
