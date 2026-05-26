@@ -35,6 +35,7 @@ export default function App() {
   const [isPaid, setIsPaid] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isScanning, setIsScanning] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [activeTicketData, setActiveTicketData] = useState<any>(null);
   
   const [balance, setBalance] = useState<number>(0);
@@ -45,8 +46,6 @@ export default function App() {
   const [paymentStep, setPaymentStep] = useState<'amount' | 'card' | 'processing' | 'success'>('amount');
   const [topUpAmount, setTopUpAmount] = useState<string>('');
   const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvc, setCardCvc] = useState('');
 
   // Подгрузка данных пользователя (срабатывает и при перезагрузке, если юзер есть)
   useEffect(() => {
@@ -75,6 +74,7 @@ export default function App() {
   }, [currentUser]);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let timer: any;
     if (isPaid) timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
@@ -120,6 +120,7 @@ export default function App() {
         setCurrentUserRole(data.role);
       }
     } catch (err) {
+      console.error(err);
       alert('Ошибка бэкенда');
     }
   };
@@ -161,6 +162,7 @@ export default function App() {
       setActiveTicketData(data.ticket);
       setIsPaid(true);
     } catch (err) {
+      console.error(err);
       alert('Ошибка соединения');
     }
   };
@@ -178,6 +180,7 @@ export default function App() {
         setPaymentStep('success');
       }
     } catch (err) {
+      console.error(err);
       alert('Ошибка');
     }
   };
@@ -187,8 +190,6 @@ export default function App() {
     setPaymentStep('amount');
     setTopUpAmount('');
     setCardNumber('');
-    setCardExpiry('');
-    setCardCvc('');
   };
 
   // --- ЭКРАН ВХОДА И РЕГИСТРАЦИИ ---
@@ -356,6 +357,7 @@ export default function App() {
             <div className="space-y-4">
               <h2 className="text-2xl font-bold tracking-tight text-[#1d1d1f]">Твои поездки</h2>
               <div className="space-y-2.5">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {ticketHistory.map((ticket: any) => (
                   <div key={ticket._id || ticket.id} onClick={() => { setActiveTicketData(ticket); setIsPaid(true); }} className="bg-white border border-[#e8e8ed] p-4 rounded-xl flex items-center justify-between hover:bg-[#f5f5f7] transition-all cursor-pointer">
                     <div className="flex items-center gap-3">

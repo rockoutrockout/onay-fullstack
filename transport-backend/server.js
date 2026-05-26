@@ -32,15 +32,13 @@ const Ticket = mongoose.model('Ticket', ticketSchema);
 const app = express();
 const PORT = 5000;
 
-// Разрешаем любые входящие запросы с любых портов и протоколов
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // --- API РОУТЫ ---
 
-// Тестовый роут для проверки связи
 app.get('/api/test', (req, res) => {
-  res.json({ message: "Бэкенд успешно работает в локальной сети!" });
+  res.json({ message: "Бэкенд успешно работает!" });
 });
 
 // 1. Регистрация
@@ -51,6 +49,14 @@ app.post('/api/auth/register', async (req, res) => {
   }
 
   try {
+    // ХАК: Принудительно удаляем проблемный индекс прямо перед регистрацией
+    try {
+      await mongoose.connection.db.collection('users').dropIndex('userId_1');
+      console.log('🗑️ Упрямый индекс userId_1 был успешно СТЕРТ из базы прямо во время запроса!');
+    } catch (indexErr) {
+      // Игнорируем ошибку, если индекса уже нет
+    }
+
     const candidate = await User.findOne({ username });
     if (candidate) {
       return res.status(400).json({ error: 'Пользователь с таким логином уже существует' });
@@ -68,7 +74,8 @@ app.post('/api/auth/register', async (req, res) => {
     console.log(`👤 Зарегистрирован пользователь ${username} с тарифом: ${newUser.role}`);
     res.status(201).json({ message: 'Регистрация успешна' });
   } catch (err) {
-    res.status(500).json({ error: 'Ошибка сервера при регистрации' });
+    console.error('❌ ОШИБКА ВНУТРИ РОУТА РЕГИСТРАЦИИ:', err);
+    res.status(500).json({ error: 'Ошибка сервера при регистрации', details: err.message });
   }
 });
 
@@ -84,6 +91,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({ username: user.username, balance: user.balance, role: user.role });
   } catch (err) {
+    console.error('❌ Ошибка при входе:', err);
     res.status(500).json({ error: 'Ошибка сервера при входе' });
   }
 });
@@ -138,6 +146,7 @@ app.post('/api/tickets/buy', async (req, res) => {
 
     res.status(201).json({ message: 'Оплачено', ticket: newTicket, newBalance: user.balance });
   } catch (err) {
+    console.error('❌ Ошибка при покупке билета:', err);
     res.status(500).json({ error: 'Ошибка при покупке билета' });
   }
 });
@@ -158,7 +167,6 @@ app.post('/api/user/topup', async (req, res) => {
   }
 });
 
-// Вещаем на '0.0.0.0', чтобы бэкенд был виден для мобильного телефона в одной Wi-Fi сети
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Бэкенд успешно запущен на http://192.168.1.194:${PORT}`);
+  console.log(`🚀 Бэкенд успешно запущен на порту ${PORT}!`);
 });
