@@ -12,10 +12,10 @@ interface ITicket {
 }
 
 export default function App() {
-  const API_BASE_URL = '/api';
+  // Твой живой бэкенд на Render.com — теперь запросы летят в облако!
+  const API_BASE_URL = 'https://onay-fullstack.onrender.com/api';
 
   // --- АВТОРИЗАЦИЯ С ЛОКАЛЬНЫМ ХРАНИЛИЩЕМ ---
-  // При старте проверяем, есть ли сохраненный юзер в localStorage
   const [currentUser, setCurrentUser] = useState<string | null>(() => {
     return localStorage.getItem('onay_username');
   });
@@ -47,7 +47,7 @@ export default function App() {
   const [topUpAmount, setTopUpAmount] = useState<string>('');
   const [cardNumber, setCardNumber] = useState('');
 
-  // Подгрузка данных пользователя (срабатывает и при перезагрузке, если юзер есть)
+  // Подгрузка данных пользователя
   useEffect(() => {
     if (!currentUser) return;
 
@@ -58,7 +58,6 @@ export default function App() {
           const userData = await userRes.json();
           setBalance(userData.balance);
           setCurrentUserRole(userData.role);
-          // На всякий случай обновляем роль в хранилище, если она изменилась на бэкенде
           localStorage.setItem('onay_role', userData.role);
         }
         const ticketsRes = await fetch(`${API_BASE_URL}/tickets/${currentUser}`);
@@ -111,7 +110,6 @@ export default function App() {
         setAuthMode('login');
         setAuthPassword('');
       } else {
-        // ЗАПОМИНАЕМ ПОЛЬЗОВАТЕЛЯ НАВСЕГДА (до выхода)
         localStorage.setItem('onay_username', data.username);
         localStorage.setItem('onay_role', data.role);
 
@@ -125,7 +123,7 @@ export default function App() {
     }
   };
 
-  // Выход из аккаунта (Очищаем память браузера)
+  // Выход из аккаунта
   const handleLogout = () => {
     localStorage.removeItem('onay_username');
     localStorage.removeItem('onay_role');
