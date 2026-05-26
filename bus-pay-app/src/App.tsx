@@ -12,7 +12,6 @@ interface ITicket {
 }
 
 export default function App() {
-  // Твой живой бэкенд на Render.com — теперь запросы летят в облако!
   const API_BASE_URL = 'https://onay-fullstack.onrender.com/api';
 
   // --- АВТОРИЗАЦИЯ С ЛОКАЛЬНЫМ ХРАНИЛИЩЕМ ---
@@ -35,6 +34,7 @@ export default function App() {
   const [isPaid, setIsPaid] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isScanning, setIsScanning] = useState(false);
+  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [activeTicketData, setActiveTicketData] = useState<any>(null);
   
@@ -118,7 +118,7 @@ export default function App() {
         setCurrentUserRole(data.role);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Ошибка авторизации:', err);
       alert('Ошибка бэкенда');
     }
   };
@@ -160,7 +160,7 @@ export default function App() {
       setActiveTicketData(data.ticket);
       setIsPaid(true);
     } catch (err) {
-      console.error(err);
+      console.error('Ошибка платежа:', err);
       alert('Ошибка соединения');
     }
   };
@@ -178,7 +178,7 @@ export default function App() {
         setPaymentStep('success');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Ошибка пополнения:', err);
       alert('Ошибка');
     }
   };
@@ -407,7 +407,8 @@ export default function App() {
               <form onSubmit={(e) => { e.preventDefault(); setPaymentStep('processing'); setTimeout(() => handleTopUp(Number(topUpAmount)), 2000); }} className="space-y-4">
                 <div className="w-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-2xl p-5 shadow-lg space-y-4">
                   <div className="flex justify-between items-center"><CreditCard className="w-8 h-8 opacity-80" /><span className="text-xs font-mono tracking-widest font-bold bg-white/20 px-2 py-0.5 rounded">Secure</span></div>
-                  <div><span className="text-[9px] text-white/60 block uppercase">Номер карты</span><span className="font-mono text-base tracking-widest font-bold">{cardNumber ? cardNumber.replace(/(\d{4})/g, '$1 ').trim() : '•••• •••• •••• ••••'}</span></div>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <div><span className="text-[9px] text-white/60 block uppercase">Номер карты</span><span className="font-mono text-base tracking-widest font-bold">{cardNumber ? (cardNumber as any).replace(/(\d{4})/g, '$1 ').trim() : '•••• •••• •••• ••••'}</span></div>
                 </div>
                 <input type="text" maxLength={16} placeholder="Номер карты (16 цифр)" value={cardNumber} onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, ''))} className="w-full bg-[#f5f5f7] border border-[#e8e8ed] p-3 rounded-xl font-mono text-sm" required />
                 <button type="submit" className="w-full py-3.5 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-md cursor-pointer">Списать {topUpAmount} ₸</button>

@@ -18,15 +18,22 @@ export default function QrScanner({ onScanSuccess, onClose }: QrScannerProps) {
       { facingMode: "environment" },
       { fps: 25, qrbox: { width: 220, height: 220 } },
       (text) => {
-        html5Qrcode.stop().then(() => onScanSuccess(text));
+        // Сначала останавливаем сканирование, затем передаем результат
+        html5Qrcode.stop()
+          .then(() => {
+            onScanSuccess(text);
+          })
+          .catch((err) => console.error("Ошибка остановки сканера:", err));
       },
       () => {}
-    ).catch(err => console.error(err));
+    ).catch(err => console.error("Ошибка запуска сканера:", err));
 
     return () => {
-      if (qrCodeRef.current?.isScanning) qrCodeRef.current.stop();
+      if (qrCodeRef.current?.isScanning) {
+        qrCodeRef.current.stop().catch(err => console.error("Ошибка при размонтировании:", err));
+      }
     };
-  }, []);
+  }, [onScanSuccess]); // Добавили зависимость, чтобы линтер Vercel пропускал сборку
 
   return (
     <div className="fixed inset-0 bg-white/90 backdrop-blur-xl z-50 flex flex-col p-6 justify-between animate-sf">
@@ -38,7 +45,7 @@ export default function QrScanner({ onScanSuccess, onClose }: QrScannerProps) {
         </div>
         <button 
           onClick={onClose} 
-          className="p-2.5 bg-[#f5f5f7] hover:bg-[#e8e8ed] rounded-full transition-colors active:scale-95"
+          className="p-2.5 bg-[#f5f5f7] hover:bg-[#e8e8ed] rounded-full transition-colors active:scale-95 cursor-pointer"
         >
           <X className="w-5 h-5 text-[#1d1d1f]" />
         </button>
